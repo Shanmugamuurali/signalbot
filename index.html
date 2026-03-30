@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+  <meta name="theme-color" content="#060d1a"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="SignalBot"/>
+  <title>SignalBot — NSE F&O</title>
+  <link rel="manifest" href="manifest.json"/>
+  <link rel="apple-touch-icon" href="icon_192.png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Barlow:wght@400;600;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg0:#060d1a;--bg1:#0b1525;--bg2:#111e33;--acc:#00e5ff;--grn:#00e676;--red:#ff1744;--gld:#ffd600;--muted:#4a6080;--text:#cdd8ea;--card:rgba(11,21,37,0.97);--r:12px}
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{height:100%;background:var(--bg0);color:var(--text);font-family:'Barlow',sans-serif;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,0.015) 2px,rgba(0,229,255,0.015) 4px);pointer-events:none;z-index:0}
+    body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;z-index:0}
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(6,13,26,0.95);backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,229,255,0.1);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:700;color:var(--acc);letter-spacing:2px}
+    .logo span{color:var(--text);font-weight:400}
+    .topbar-right{display:flex;align-items:center;gap:8px}
+    .dot{width:7px;height:7px;border-radius:50%;background:var(--grn);animation:pulse 2s ease infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .status-text{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--grn);letter-spacing:1px}
+    .refresh-btn{background:var(--acc);color:#000;border:none;border-radius:6px;padding:7px 14px;font-family:'Barlow',sans-serif;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:1px;transition:all .2s}
+    .refresh-btn:active{transform:scale(.93);opacity:.8}
+    .spin{animation:spin .8s linear infinite;display:inline-block}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    main{position:relative;z-index:1;padding:14px 14px 90px;max-width:560px;margin:0 auto}
+    .compound-hero{background:var(--card);border:1px solid rgba(0,229,255,0.12);border-radius:var(--r);padding:18px 16px;margin-bottom:14px;position:relative;overflow:hidden;animation:fadeUp .4s ease both}
+    .compound-hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--acc),transparent)}
+    .hero-label{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:8px}
+    .capital-display{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+    .capital-value{font-family:'IBM Plex Mono',monospace;font-size:32px;font-weight:700;color:var(--acc)}
+    .capital-growth{font-size:13px;font-weight:700;padding:3px 8px;border-radius:4px;background:rgba(0,230,118,.12);color:var(--grn)}
+    .capital-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:16px}
+    .progress-wrap{margin-bottom:12px}
+    .progress-label{display:flex;justify-content:space-between;margin-bottom:6px}
+    .progress-label span{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+    .progress-label strong{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--acc)}
+    .progress-track{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+    .progress-fill{height:100%;background:linear-gradient(90deg,var(--acc),var(--grn));border-radius:3px;transition:width .8s ease}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .hstat{background:rgba(255,255,255,.03);border:1px solid rgba(0,229,255,.08);border-radius:8px;padding:10px;text-align:center}
+    .hstat-val{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:700;margin-bottom:3px}
+    .hstat-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+    .direction-badge{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:var(--r);margin-bottom:14px;border:1px solid;animation:fadeUp .35s ease both}
+    .direction-badge.bearish{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.25)}
+    .direction-badge.bullish{background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.25)}
+    .direction-badge.neutral{background:rgba(0,229,255,.06);border-color:rgba(0,229,255,.15)}
+    .dir-label{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+    .dir-value{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;letter-spacing:1px}
+    .bearish .dir-value{color:var(--red)}.bullish .dir-value{color:var(--grn)}.neutral .dir-value{color:var(--acc)}
+    .dir-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted)}
+    .dir-right{text-align:right}
+    .vix-val{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700;color:var(--gld)}
+    .vix-lbl{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase}
+    .section-hdr{display:flex;align-items:center;justify-content:space-between;margin:18px 0 10px}
+    .section-title{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--muted)}
+    .section-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--acc);background:rgba(0,229,255,.08);padding:2px 8px;border-radius:4px}
+    .trade-card{background:var(--card);border:1px solid rgba(0,229,255,.1);border-radius:var(--r);padding:14px;margin-bottom:10px;position:relative;overflow:hidden;animation:fadeUp .4s ease both}
+    .trade-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+    .trade-card.strong::before{background:var(--grn)}.trade-card.medium::before{background:var(--acc)}
+    .trade-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+    .trade-name{font-size:18px;font-weight:900;letter-spacing:-.5px}
+    .tier-pill{font-family:'IBM Plex Mono',monospace;font-size:8px;letter-spacing:2px;padding:3px 8px;border-radius:4px;text-transform:uppercase}
+    .tier-pill.strong{background:rgba(0,230,118,.12);color:var(--grn);border:1px solid rgba(0,230,118,.25)}
+    .tier-pill.medium{background:rgba(0,229,255,.1);color:var(--acc);border:1px solid rgba(0,229,255,.2)}
+    .trade-action{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+    .pill{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;padding:4px 10px;border-radius:5px;letter-spacing:1px}
+    .pill-buy{background:rgba(0,230,118,.14);color:var(--grn)}
+    .pill-pe{background:rgba(255,23,68,.14);color:var(--red)}
+    .pill-ce{background:rgba(0,229,255,.12);color:var(--acc)}
+    .strike{font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:700}
+    .expiry{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-left:auto}
+    .trade-nums{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:rgba(0,0,0,.2);border-radius:8px;padding:10px;margin-bottom:10px}
+    .tnum{text-align:center}
+    .tnum-val{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;margin-bottom:2px}
+    .tnum-lbl{font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+    .tnum-val.red{color:var(--red)}.tnum-val.grn{color:var(--grn)}
+    .trade-footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid rgba(255,255,255,.04)}
+    .trade-time{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted)}
+    .trade-signal{font-size:10px;color:var(--muted)}
+    .us-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .us-card{background:var(--card);border:1px solid rgba(0,229,255,.08);border-radius:var(--r);padding:12px;animation:fadeUp .4s ease both}
+    .us-ticker{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:var(--acc);margin-bottom:4px}
+    .us-change{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:700;line-height:1;margin-bottom:3px}
+    .us-name{font-size:9px;color:var(--muted);letter-spacing:.5px}
+    .us-bar{margin-top:8px;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden}
+    .us-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+    .pos{color:var(--grn)}.neg{color:var(--red)}
+    .rules-card{background:var(--card);border:1px solid rgba(0,229,255,.08);border-radius:var(--r);padding:16px;animation:fadeUp .4s ease both;margin-bottom:12px}
+    .rule-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+    .rule-row:last-child{border-bottom:none}
+    .rule-lbl{font-size:12px;color:var(--muted)}
+    .rule-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text)}
+    .bottom-nav{position:fixed;bottom:0;left:0;right:0;z-index:100;background:rgba(6,13,26,.97);backdrop-filter:blur(20px);border-top:1px solid rgba(0,229,255,.1);display:flex;justify-content:space-around;padding:10px 0 max(10px,env(safe-area-inset-bottom))}
+    .nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 18px;border-radius:8px;transition:all .2s}
+    .nav-item:active{transform:scale(.9)}
+    .nav-icon{font-size:20px}
+    .nav-lbl{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+    .nav-item.active .nav-lbl{color:var(--acc)}
+    .nav-item.active .nav-icon{filter:drop-shadow(0 0 6px var(--acc))}
+    .tab-content{display:none}.tab-content.active{display:block}
+    .empty{text-align:center;padding:40px 20px;color:var(--muted)}
+    .empty-icon{font-size:36px;margin-bottom:12px}
+    .empty-text{font-size:12px;line-height:1.7}
+    .toast{position:fixed;top:68px;left:50%;transform:translateX(-50%) translateY(-16px);background:var(--bg2);border:1px solid var(--acc);color:var(--acc);font-family:'IBM Plex Mono',monospace;font-size:10px;padding:9px 18px;border-radius:7px;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .loading-overlay{display:none;position:fixed;inset:0;background:rgba(6,13,26,.88);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+    .loading-overlay.show{display:flex}
+    .loader{width:44px;height:44px;border:2px solid rgba(0,229,255,.15);border-top-color:var(--acc);border-radius:50%;animation:spin .7s linear infinite}
+    .loader-text{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:3px;animation:blink 1.4s ease infinite}
+    @keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+    .updated-at{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);text-align:center;padding:8px 0 4px}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  </style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">SIGNAL<span>BOT</span></div>
+  <div class="topbar-right">
+    <div class="dot"></div>
+    <span class="status-text" id="mkt-status">LIVE</span>
+    <button class="refresh-btn" id="refresh-btn" onclick="loadSignals()"><span id="ref-icon">↻</span> Refresh</button>
+  </div>
+</div>
+<main>
+  <div class="tab-content active" id="tab-dashboard">
+    <div class="compound-hero">
+      <div class="hero-label">Compounding Tracker</div>
+      <div class="capital-display">
+        <div class="capital-value" id="cap-value">Loading…</div>
+        <div class="capital-growth" id="cap-growth">+0%</div>
+      </div>
+      <div class="capital-sub" id="cap-sub">Fetching live data…</div>
+      <div class="progress-wrap">
+        <div class="progress-label"><span>Rs 13,565 start</span><strong id="prog-right">0% to EMI target</strong></div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-val" id="stat-lots" style="color:var(--acc)">—</div><div class="hstat-lbl">Lots Today</div></div>
+        <div class="hstat"><div class="hstat-val" id="stat-monthly" style="color:var(--grn)">—</div><div class="hstat-lbl">Est Monthly</div></div>
+        <div class="hstat"><div class="hstat-val" id="stat-months" style="color:var(--gld)">—</div><div class="hstat-lbl">Mths to EMI</div></div>
+      </div>
+    </div>
+    <div class="direction-badge neutral" id="dir-badge">
+      <div>
+        <div class="dir-label">Market Direction</div>
+        <div class="dir-value" id="dir-value">LOADING</div>
+        <div class="dir-meta" id="dir-meta">Fetching…</div>
+      </div>
+      <div class="dir-right">
+        <div class="vix-val" id="vix-val">—</div>
+        <div class="vix-lbl">VIX</div>
+      </div>
+    </div>
+    <div class="section-hdr">
+      <span class="section-title">Today's Trades</span>
+      <span class="section-badge" id="trade-count">0 signals</span>
+    </div>
+    <div id="trade-container"><div class="empty"><div class="empty-icon">📡</div><div class="empty-text">Tap Refresh to load today's signals</div></div></div>
+    <div class="updated-at" id="updated-at"></div>
+  </div>
+  <div class="tab-content" id="tab-signals">
+    <div class="section-hdr"><span class="section-title">US Overnight Data</span></div>
+    <div class="us-grid" id="us-grid"><div class="empty" style="grid-column:span 2"><div class="empty-icon">🇺🇸</div><div class="empty-text">Tap Refresh</div></div></div>
+  </div>
+  <div class="tab-content" id="tab-rules">
+    <div class="section-hdr"><span class="section-title">Trading Rules</span></div>
+    <div class="rules-card">
+      <div class="rule-row"><span class="rule-lbl">Instruments</span><span class="rule-val">WIPRO·INFY·HDFCBANK·ICICIBANK</span></div>
+      <div class="rule-row"><span class="rule-lbl">Tiers traded</span><span class="rule-val">STRONG + MEDIUM only</span></div>
+      <div class="rule-row"><span class="rule-lbl">WEAK signals</span><span class="rule-val" style="color:var(--red)">SKIPPED</span></div>
+      <div class="rule-row"><span class="rule-lbl">Stop Loss</span><span class="rule-val" style="color:var(--red)">55–60% of premium</span></div>
+      <div class="rule-row"><span class="rule-lbl">Target</span><span class="rule-val" style="color:var(--grn)">120–180% profit</span></div>
+      <div class="rule-row"><span class="rule-lbl">Exit by</span><span class="rule-val" style="color:var(--gld)">11:00 AM IST sharp</span></div>
+      <div class="rule-row"><span class="rule-lbl">Capital</span><span class="rule-val" id="rules-capital">Rs 13,565</span></div>
+      <div class="rule-row"><span class="rule-lbl">EMI Target</span><span class="rule-val" style="color:var(--red)">Rs 1,35,000/month</span></div>
+      <div class="rule-row"><span class="rule-lbl">Broker</span><span class="rule-val">Upstox — Rs 20/order</span></div>
+    </div>
+    <div class="section-hdr"><span class="section-title">Daily Steps</span></div>
+    <div class="rules-card">
+      <div class="rule-row"><span class="rule-lbl">7:00 AM</span><span class="rule-val">Run bot → check this app</span></div>
+      <div class="rule-row"><span class="rule-lbl">9:00 AM</span><span class="rule-val">Place AMO on Upstox</span></div>
+      <div class="rule-row"><span class="rule-lbl">9:15 AM</span><span class="rule-val">Confirm gap → enter</span></div>
+      <div class="rule-row"><span class="rule-lbl">11:00 AM</span><span class="rule-val" style="color:var(--red)">EXIT ALL positions</span></div>
+      <div class="rule-row"><span class="rule-lbl">11:05 AM</span><span class="rule-val">Update capital in bot</span></div>
+      <div class="rule-row"><span class="rule-lbl">RULE #1</span><span class="rule-val" style="color:var(--red)">NEVER withdraw before Mo 2</span></div>
+    </div>
+  </div>
+</main>
+<nav class="bottom-nav">
+  <div class="nav-item active" id="nav-dashboard" onclick="switchTab('dashboard')"><span class="nav-icon">📈</span><span class="nav-lbl">Dashboard</span></div>
+  <div class="nav-item" id="nav-signals" onclick="switchTab('signals')"><span class="nav-icon">🇺🇸</span><span class="nav-lbl">US Signals</span></div>
+  <div class="nav-item" id="nav-rules" onclick="switchTab('rules')"><span class="nav-icon">📋</span><span class="nav-lbl">Rules</span></div>
+</nav>
+<div class="loading-overlay" id="loading"><div class="loader"></div><div class="loader-text">FETCHING SIGNALS…</div></div>
+<div class="toast" id="toast"></div>
+<script>
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+function switchTab(t){document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');document.getElementById('nav-'+t).classList.add('active')}
+function showToast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
+function updateStatus(){const now=new Date();const ist=new Date(now.toLocaleString('en-US',{timeZone:'Asia/Kolkata'}));const m=ist.getHours()*60+ist.getMinutes();const el=document.getElementById('mkt-status');if(m>=555&&m<=930){el.textContent='LIVE';el.style.color='var(--grn)'}else if(m>=530&&m<555){el.textContent='PRE';el.style.color='var(--gld)'}else{el.textContent='CLOSED';el.style.color='var(--muted)'}}
+updateStatus();setInterval(updateStatus,60000);
+async function loadSignals(){
+  const btn=document.getElementById('refresh-btn');const icon=document.getElementById('ref-icon');const overlay=document.getElementById('loading');
+  icon.classList.add('spin');btn.disabled=true;overlay.classList.add('show');
+  try{const res=await fetch('./signals.json?t='+Date.now());if(!res.ok)throw new Error('not found');const data=await res.json();renderDashboard(data);showToast('Signals updated — '+data.updated)}
+  catch(e){renderDashboard(getDemoData());showToast('Demo data — run bot to get live signals')}
+  finally{icon.classList.remove('spin');btn.disabled=false;overlay.classList.remove('show')}
+}
+function renderDashboard(data){
+  const cap=data.capital||13565;const growth=((cap/13565)-1)*100;const lots=data.lots_today||1;const monthly=data.monthly_est||63506;
+  document.getElementById('cap-value').textContent='Rs '+cap.toLocaleString('en-IN');
+  document.getElementById('cap-growth').textContent=(growth>=0?'+':'')+growth.toFixed(1)+'%';
+  document.getElementById('cap-growth').style.color=growth>=0?'var(--grn)':'var(--red)';
+  document.getElementById('cap-sub').textContent=lots+'x lots today  ·  Est Rs '+(monthly).toLocaleString('en-IN')+'/month';
+  document.getElementById('stat-lots').textContent=lots+'x';
+  document.getElementById('stat-monthly').textContent='Rs '+(monthly/1000).toFixed(0)+'K';
+  document.getElementById('stat-months').textContent=(data.months_to_emi||'—')+' mo';
+  document.getElementById('rules-capital').textContent='Rs '+cap.toLocaleString('en-IN');
+  const pct=Math.min(100,Math.round(lots/24*100));
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('prog-right').textContent=pct+'% to EMI target';
+  const dir=(data.direction||'NEUTRAL').toUpperCase();
+  const badge=document.getElementById('dir-badge');badge.className='direction-badge '+dir.toLowerCase();
+  document.getElementById('dir-value').textContent=dir;
+  document.getElementById('dir-meta').textContent=(data.consensus||0)+'/4 signals agree';
+  document.getElementById('vix-val').textContent=(data.vix||0).toFixed(1);
+  const trades=data.trades||[];
+  document.getElementById('trade-count').textContent=trades.length+' signals';
+  const container=document.getElementById('trade-container');
+  if(!trades.length){container.innerHTML='<div class="empty"><div class="empty-icon">'+(dir==='NEUTRAL'?'😴':'🛡️')+'</div><div class="empty-text">'+(data.no_trade_reason||'No signals tonight — capital protected')+'</div></div>'}
+  else{container.innerHTML=trades.map((t,i)=>`<div class="trade-card ${t.tier.toLowerCase()}" style="animation-delay:${i*.07}s"><div class="trade-top"><div class="trade-name">${t.instrument}</div><div class="tier-pill ${t.tier.toLowerCase()}">${t.tier}</div></div><div class="trade-action"><span class="pill pill-buy">BUY</span><span class="pill pill-${t.opt_type.toLowerCase()}">${t.opt_type}</span><span class="strike">Rs ${Number(t.strike).toLocaleString('en-IN')}</span><span class="expiry">${t.expiry}</span></div><div class="trade-nums"><div class="tnum"><div class="tnum-val">Rs ${t.premium}</div><div class="tnum-lbl">Premium</div></div><div class="tnum"><div class="tnum-val red">Rs ${t.sl}</div><div class="tnum-lbl">Stop Loss</div></div><div class="tnum"><div class="tnum-val grn">Rs ${t.target}</div><div class="tnum-lbl">Target</div></div></div><div class="trade-footer"><span class="trade-time">9:15 AM - Exit by 11 AM</span><span class="trade-signal">${t.us_signal}</span></div></div>`).join('')}
+  const sigs=data.us_signals||[];
+  document.getElementById('us-grid').innerHTML=!sigs.length?'<div class="empty" style="grid-column:span 2"><div class="empty-icon">📡</div><div class="empty-text">No data</div></div>':sigs.map(s=>{const pos=s.change>=0;const pct=Math.min(100,Math.abs(s.change)/3*100);return`<div class="us-card"><div class="us-ticker">${s.ticker}</div><div class="us-change ${pos?'pos':'neg'}">${pos?'+':''}${s.change.toFixed(2)}%</div><div class="us-name">${s.name}</div><div class="us-bar"><div class="us-bar-fill" style="width:${pct}%;background:${pos?'var(--grn)':'var(--red)'}"></div></div></div>`}).join('');
+  document.getElementById('updated-at').textContent='Updated: '+(data.updated||'—');
+}
+function getDemoData(){return{updated:'Demo — run bot to get live data',direction:'BEARISH',consensus:4,vix:31.1,capital:13565,lots_today:1,growth_pct:0,monthly_est:63506,months_to_emi:2,emi_target:135000,us_signals:[{ticker:'SPY',name:'S&P 500 ETF',change:-1.71},{ticker:'QQQ',name:'Nasdaq ETF',change:-1.95},{ticker:'XLK',name:'Tech Sector',change:-2.10},{ticker:'XLF',name:'Financials',change:-2.53}],trades:[{instrument:'INFY',direction:'BEARISH',tier:'STRONG',action:'BUY',opt_type:'PE',strike:1260,expiry:'24-Apr-2026',premium:22,sl:12,target:61,lot:400,capital:8800,us_signal:'XLK -2.10%'},{instrument:'WIPRO',direction:'BEARISH',tier:'MEDIUM',action:'BUY',opt_type:'PE',strike:245,expiry:'24-Apr-2026',premium:5,sl:3,target:11,lot:1500,capital:7500,us_signal:'XLK -2.10%'}],no_trade_reason:''}}
+window.addEventListener('load',()=>{loadSignals();if('Notification' in window&&Notification.permission==='default')setTimeout(()=>Notification.requestPermission(),3000)});
+</script>
+</body>
+</html>

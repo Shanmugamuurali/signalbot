@@ -1,0 +1,46 @@
+{
+  "updated": "30-Mar-2026 21:37 IST",
+  "direction": "NEUTRAL",
+  "consensus": 1,
+  "vix": 29.6,
+  "capital": 13565.0,
+  "lots_today": 1,
+  "growth_pct": 0.0,
+  "monthly_est": 63484.0,
+  "months_to_emi": 2,
+  "emi_target": 135000,
+  "us_signals": [
+    {
+      "ticker": "SPY",
+      "name": "S&P 500 ETF",
+      "change": 0.37,
+      "price": 636.45
+    },
+    {
+      "ticker": "QQQ",
+      "name": "Nasdaq 100 ETF",
+      "change": 0.04,
+      "price": 562.83
+    },
+    {
+      "ticker": "XLK",
+      "name": "Tech Sector ETF",
+      "change": -0.94,
+      "price": 128.7
+    },
+    {
+      "ticker": "XLF",
+      "name": "Financials ETF",
+      "change": 1.6,
+      "price": 48.58
+    },
+    {
+      "ticker": "XLE",
+      "name": "Energy ETF",
+      "change": 0.68,
+      "price": 62.99
+    }
+  ],
+  "trades": [],
+  "no_trade_reason": "Filters blocked all signals \u2014 capital protected today"
+}
