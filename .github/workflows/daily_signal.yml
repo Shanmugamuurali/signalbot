@@ -5,6 +5,9 @@ on:
     - cron: '30 1 * * 1-5'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   run_bot:
     runs-on: ubuntu-latest
@@ -12,6 +15,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Python 3.11
         uses: actions/setup-python@v5
@@ -33,24 +38,3 @@ jobs:
           git add signals.json capital_log.txt my_capital.txt
           git diff --staged --quiet || git commit -m "Auto signal $(date +'%d-%b %H:%M')"
           git push
-```
-
-**Step 5** — Scroll down → Click **"Commit new file"**
-
----
-
-## Step 6 — Enable Write Permissions
-
-Go to your repo → **Settings** → **Actions** → **General**
-
-Scroll down to **"Workflow permissions"**:
-- Select ✅ **"Read and write permissions"**
-- Click **Save**
-
----
-
-## Step 7 — Test It Manually
-
-Go to:
-```
-https://github.com/Shanmugamuurali/signalbot/actions
