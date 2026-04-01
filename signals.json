@@ -1,8 +1,8 @@
 {
-  "updated": "31-Mar-2026 22:22 IST",
+  "updated": "01-Apr-2026 07:09 IST",
   "direction": "BULLISH",
   "consensus": 4,
-  "vix": 27.3,
+  "vix": 25.2,
   "capital": 13565.0,
   "lots_today": 1,
   "growth_pct": 0.0,
@@ -13,32 +13,32 @@
     {
       "ticker": "SPY",
       "name": "S&P 500 ETF",
-      "change": 2.26,
-      "price": 646.24
+      "change": 2.91,
+      "price": 650.34
     },
     {
       "ticker": "QQQ",
       "name": "Nasdaq 100 ETF",
-      "change": 2.68,
-      "price": 573.22
+      "change": 3.39,
+      "price": 577.18
     },
     {
       "ticker": "XLK",
       "name": "Tech Sector ETF",
-      "change": 3.22,
-      "price": 131.6
+      "change": 4.24,
+      "price": 132.9
     },
     {
       "ticker": "XLF",
       "name": "Financials ETF",
-      "change": 1.49,
-      "price": 49.08
+      "change": 2.09,
+      "price": 49.37
     },
     {
       "ticker": "XLE",
       "name": "Energy ETF",
-      "change": -0.25,
-      "price": 61.81
+      "change": -1.13,
+      "price": 61.26
     }
   ],
   "trades": [],
