@@ -3,4 +3,8 @@
 =======
 2026-03-30 01:18 | Capital=Rs 13,565 | P&L=Rs +0 | Initial capital
 >>>>>>> 35a29334b5ce6ce12e1c2b7c064e050b5c461155
+<<<<<<< HEAD
 2026-03-31 22:19 | Capital=Rs 13,565 | P&L=Rs +0 | Initial capital
+=======
+2026-03-31 17:24 | Capital=Rs 13,565 | P&L=Rs +0 | Initial capital
+>>>>>>> 0034e202f5d390d1f88399acadd3a29f7292f5a3
